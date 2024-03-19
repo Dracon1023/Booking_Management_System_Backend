@@ -1,14 +1,13 @@
 name: Docker Image CI for GHCR
 
-on:
-	push
+on: push
 
 jobs:
 	build_and_publish:
 		runs-on: ubuntu-latest
 		steps:
 			- uses: actions/checkout@v3
-			- name: Build an dpush the image
+			- name: Build and push the image
 			  run: |
 				docker login --username Dracon1023 --password ${{secrets.ACCESS_TOKEN}} ghcr.io
 				docker build -t ghcr.io/Dracon1023/Booking_Management_System_Backend:latest --file Dockerfile .
