@@ -8,6 +8,7 @@ class User extends Realm.Object {
 			userType: {type: "int", default: 0},
 			login: "login",
 			dashboard: "dashboard?",
+			paymentDetails: "paymentDetails[]",
 		},
 		primaryKey: "_id",
 	};
@@ -39,7 +40,6 @@ class Dashboard extends Realm.Object {
 			membershipStatus: "string",
 			promotionalOffers: "string[]",
 			rewardPoints: {type: "int", default: 0},
-			paymentDetails: "paymentDetails[]",
 		},
 	};
 }
@@ -63,9 +63,12 @@ class PaymentDetails extends Realm.Object {
 		embedded: true,
 		properties: {
 			type: "string",
+			firstname: "string",
+			lastname: "string",
 			cardNumber: "string",
 			expiryDate: "string",
 			cvv: "string",
+			zip: "string",
 		},
 	};
 }

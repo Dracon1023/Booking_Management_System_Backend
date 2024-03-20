@@ -296,8 +296,31 @@ app.get('/cities/:country', async (req, res) => {
 	  res.status(500).json({ error: 'Something went wrong!' });
 	}
   });
-  
-  
+
+// Adds payment details to the user's database entry
+app.post('/users/paymentDetails/addDetails', async (req, res) => {
+	try {
+		const details = req.body.details;
+		const username = req.body.username;
+		db.collection('users').updateOne(
+			{}
+		)
+
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Something went wrong!' });
+	}
+});
+
+// Removes a specific payment details from a user's database entry
+app.delete('/users/paymentDetails/removeDetails', async (req, res) => {
+
+});
+
+// Update a specific payment details in a user's database entry
+app.patch('/users/paymentDetails/updateDetails', async (req, res) => {
+
+});
   
   
   
