@@ -297,7 +297,23 @@ app.get('/cities/:country', async (req, res) => {
 	}
   });
 
-app.get('/payment', authenticateJWT, async (req, res) => {
+
+  app.get('/foodItems', async (req, res) => {
+	try {
+	  const documents = await db.collection('foodItems').find().toArray();
+    
+	  if (!documents || documents.length === 0) {
+		res.status(404).json({ error: 'No food items found' });
+	  } else {
+		res.status(200).json(documents);
+	  }
+	} catch (error) {
+	  console.error('Error:', error);
+	  res.status(500).json({ error: 'Something went wrong!' });
+	}
+  });
+
+  app.get('/payment', authenticateJWT, async (req, res) => {
 	try {
 		const user = await db.collection('users').findOne({ "login.email": req.user.username });
 		const paymentDetails = user.paymentDetails;
@@ -340,8 +356,5 @@ app.delete('/payment', authenticateJWT, async (req, res) => {
 		res.status(500).json({ success: false, error: 'Could not delete payment details' });
 	}
 });
-  
-  
-  
   
   
