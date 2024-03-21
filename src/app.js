@@ -297,6 +297,21 @@ app.get('/cities/:country', async (req, res) => {
 	}
   });
 
+  app.get('/foodItems', async (req, res) => {
+	try {
+	  const documents = await db.collection('foodItems').find().toArray();
+  
+	  if (!documents || documents.length === 0) {
+		res.status(404).json({ error: 'No food items found' });
+	  } else {
+		res.status(200).json(documents);
+	  }
+	} catch (error) {
+	  console.error('Error:', error);
+	  res.status(500).json({ error: 'Something went wrong!' });
+	}
+  });
+
 // Adds payment details to the user's database entry
 app.post('/users/paymentDetails/addDetails', async (req, res) => {
 	try {
