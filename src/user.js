@@ -62,6 +62,7 @@ class PaymentDetails extends Realm.Object {
 		name: "paymentDetails",
 		embedded: true,
 		properties: {
+			_id: { type: "objectId", default: () => new Realm.BSON.ObjectId() },
 			type: "string",
 			cardNumber: "string",
 			expiryDate: "string",
