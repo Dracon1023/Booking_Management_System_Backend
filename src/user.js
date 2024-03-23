@@ -1,5 +1,3 @@
-
-
 class User extends Realm.Object {
 	static schema = {
 		name: "user",
@@ -35,6 +33,8 @@ class Dashboard extends Realm.Object {
 		embedded: true,
 		properties: {
 			basicInfo: "basicInfo",
+			profileImage:"string?",
+			dob:"string?",
 			interests: "string[]",
 			favoriteGenre: "string?",
 			membershipStatus: "string",
@@ -53,6 +53,10 @@ class BasicInfo extends Realm.Object {
 			lastName: "string",
 			email: "string",
 			mobileNumber: "string",
+			city: "string?",
+			state: "string?",
+			country: "string?",
+			dob: "string?",
 		},
 	};
 }

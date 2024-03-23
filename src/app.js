@@ -216,14 +216,16 @@ app.patch('/users/:email', (req, res) => {
 		})
 })
 
-app.put('/users/reset', (req, res) => {
+app.put('/users/reset', async (req, res) => {
 	const creds = req.body
-	let username = creds.username
-	let password = creds.password
+	let username = creds.username;
+	//I have changed this because the password was not hashed.
+	const password = creds.password.toString();
+	const hashedPassword = await bcrypt.hash(password, 10);
 	db.collection('users')
 		.findOneAndUpdate(
 			{ "login.email": username },
-			{ $set: { "login.password": password } }, 
+			{ $set: { "login.password": hashedPassword } }, 
 			{ returnOriginal: false }
 		)
 		.then(result => {
@@ -234,6 +236,55 @@ app.put('/users/reset', (req, res) => {
 			res.status(500).json({error: 'Error updating password'})
 		})
 })
+
+app.post('/users/me/update', authenticateJWT, async (req, res) => {
+    try {
+        const { basicInfo, paymentDetails, interests, favoriteGenre,  profileImage, rewardPoints,promotionalOffers, membershipStatus } = req.body;
+
+        // Extract the email from the authenticated user's token
+        const userEmail = req.user.username;
+		console.log(rewardPoints);
+
+        // Update user document in the database based on the extracted email
+        const result = await db.collection('users').updateOne(
+            { "login.email": userEmail }, // Match user by email extracted from the token
+            {
+                $set: {
+                    "basicInfo.firstName": basicInfo.firstName,
+                    "basicInfo.lastName": basicInfo.lastName,
+                    "basicInfo.mobileNumber": basicInfo.mobileNumber,
+                    "basicInfo.city": basicInfo.city,
+                    "basicInfo.state": basicInfo.state,
+                    "basicInfo.country": basicInfo.country,
+					"basicInfo.dob" : basicInfo.dob,
+					"basicInfo.email": userEmail,
+					profileImage,
+                    paymentDetails,
+                    interests,
+                    favoriteGenre,
+					promotionalOffers,
+					rewardPoints,
+					membershipStatus,
+                }
+            }
+        );
+
+        if (result.modifiedCount === 1) {
+            console.log("Update was successful!");
+            // Document updated successfully
+            res.status(200).json({ success: true, message: 'User information updated successfully' });
+        } else {
+            console.log("User not found! in update");
+            // No document was modified, likely due to user not found
+            res.status(404).json({ success: false, error: 'User not found or no changes applied' });
+        }
+    } catch (error) {
+        // Internal server error
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Something went wrong!' });
+    }
+});
+
 
 app.get('/countries', (req, res) => {
     let countries = []
