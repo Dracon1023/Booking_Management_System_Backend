@@ -359,6 +359,7 @@ app.get('/foodItems', async (req, res) => {
 			res.status(404).json({ error: 'No food items found' });
 		} else {
 			res.status(200).json(documents);
+			
 		}
 	} catch (error) {
 		console.error('Error:', error);
@@ -400,7 +401,7 @@ const REFRESH_TOKEN = process.env.REFRESH_TOKEN
 const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN })
 
-const sendMail = async (bookingDetails, userEmail) => {
+const sendMail = async (bookingDetails, userEmail, firstname) => {
 	try {
 		const accessToken = await oAuth2Client.getAccessToken()
 		const transporter = nodemailer.createTransport({
@@ -427,7 +428,7 @@ const sendMail = async (bookingDetails, userEmail) => {
 			to: userEmail,
 			subject: 'Your Movie Mates Booking Confirmation',
 			text: `The Movie Mates Team`,
-			html: `<h1>Hello,</h1>
+			html: `<h1>Hello ${firstname},</h1>
 			
 			<p>Thank you for booking with Movie Mates!</p>
 			
@@ -437,7 +438,7 @@ const sendMail = async (bookingDetails, userEmail) => {
 			<li>Movie: ${bookingDetails.movie}</li>
 			<li>Time: ${bookingDetails.time}</li>
 			<li>Date: ${bookingDetails.date}</li>
-			<li>Seats: ${bookingDetails.seats}</li>
+			<li>Seat No.: ${bookingDetails.seats}</li>
 			<li>Food Items: ${bookingDetails.foodItems}</li>
 			<li>Total Cost: ${bookingDetails.totalCost}</li>
 			</ul>
@@ -463,15 +464,47 @@ const sendMail = async (bookingDetails, userEmail) => {
 	}
 }
 app.post('/send-email', async (req, res) => {
-	const { bookingDetails, userEmail } = req.body;
+	const { bookingDetails, userEmail,firstname } = req.body;
 
 	try {
-		const result = await sendMail(bookingDetails, userEmail);
+		const result = await sendMail(bookingDetails, userEmail, firstname);
 		res.status(200).json({ message: 'Email sent successfully', result });
 	} catch (error) {
 		res.status(500).json({ message: 'Failed to send email', error });
 	}
 });
+
+app.post('/paymentInfo', async (req, res) => {
+	try {
+	  // Extract data from req.body
+	  const paymentDetails = req.body;
+  
+	  // Insert the paymentDetails into the paymentInfo collection
+	  const result = await db.collection('paymentInfo').insertOne(paymentDetails);
+  
+	  res.status(200).json({ message: 'Payment details added successfully', result });
+	} catch (error) {
+	  console.error('Error:', error);
+	  res.status(500).json({ error: 'Something went wrong!' });
+	}
+  });
+
+
+  app.post('/bookingInfo', async (req, res) => {
+	try {
+	  // Extract data from req.body
+	  const bookingDetails = req.body;
+  
+	  // Insert the paymentDetails into the paymentInfo collection
+	  const result = await db.collection('bookingInfo').insertOne(bookingDetails);
+  
+	  res.status(200).json({ message: 'Booking details added successfully', result });
+	} catch (error) {
+	  console.error('Error:', error);
+	  res.status(500).json({ error: 'Something went wrong!' });
+	}
+  });
+  
 
 
 

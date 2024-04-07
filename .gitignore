@@ -365,6 +365,9 @@ dist
 # TernJS port file
 .tern-port
 
+# QR code generated
+.qrcode.png
+
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
