@@ -359,6 +359,7 @@ app.get('/foodItems', async (req, res) => {
 			res.status(404).json({ error: 'No food items found' });
 		} else {
 			res.status(200).json(documents);
+			
 		}
 	} catch (error) {
 		console.error('Error:', error);
