@@ -367,6 +367,60 @@ app.get('/foodItems', async (req, res) => {
 	}
 });
 
+app.get('/bookingInfo', async (req, res) => {
+	try {
+		const documents = await db.collection('bookingInfo').find().toArray();
+
+		if (!documents || documents.length === 0) {
+			res.status(404).json({ error: 'No booking info found' });
+		} else {
+			res.status(200).json(documents);
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Something went wrong!' });
+	}
+});
+
+app.get('/specificBookingInfo', async (req, res) => {
+	try {
+	  // Extract title, time, and date from the query parameters
+	  const { title, time, date,theatre } = req.query;
+  
+	  // Decode the URL-encoded parameters
+	  const decodedTitle = decodeURIComponent(title);
+	  const decodedTime = decodeURIComponent(time);
+	  var decodedTheatre = decodeURIComponent(theatre);
+	  var decodedDate = decodeURIComponent(date);
+	  decodedDate = decodedDate.trim();
+	  decodedTheatre = decodedTheatre.trim();
+  
+	  // Construct the query to find the specific booking information
+	  const query = {
+		movie: decodedTitle,
+		time: decodedTime,
+		date: decodedDate,
+		theatre:decodedTheatre
+	  };
+
+  
+	  // Fetch the documents from the database that match the query
+	  const documents = await db.collection('bookingInfo').find(query).toArray();
+  
+	  if (!documents || documents.length === 0) {
+		res.status(404).json({ error: 'No booking info found for the specified movie, time, and date' });
+	  } else {
+		// Respond with the fetched documents
+		res.status(200).json(documents);
+	  }
+	} catch (error) {
+	  console.error('Error:', error);
+	  res.status(500).json({ error: 'Something went wrong with the database operation' });
+	}
+  });
+  
+  
+
 // Adds payment details to the user's database entry
 app.post('/users/paymentDetails/addDetails', async (req, res) => {
 	try {
