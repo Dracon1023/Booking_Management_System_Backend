@@ -382,6 +382,21 @@ app.get('/bookingInfo', async (req, res) => {
 	}
 });
 
+app.get('/paymentInfo', async (req, res) => {
+	try {
+		const documents = await db.collection('paymentInfo').find().toArray();
+
+		if (!documents || documents.length === 0) {
+			res.status(404).json({ error: 'No booking info found' });
+		} else {
+			res.status(200).json(documents);
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Something went wrong!' });
+	}
+});
+
 app.get('/specificBookingInfo', async (req, res) => {
 	try {
 	  // Extract title, time, and date from the query parameters
@@ -489,6 +504,7 @@ const sendMail = async (bookingDetails, userEmail, firstname) => {
 			<p>Here are your booking details:</p>
 			
 			<ul>
+			<li>Movie: ${bookingDetails.transactionID}</li>
 			<li>Movie: ${bookingDetails.movie}</li>
 			<li>Time: ${bookingDetails.time}</li>
 			<li>Date: ${bookingDetails.date}</li>
