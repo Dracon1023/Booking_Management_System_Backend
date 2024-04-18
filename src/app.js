@@ -397,6 +397,64 @@ app.get('/paymentInfo', async (req, res) => {
 	}
 });
 
+app.get('/paymentInfoByEmail/:email', async (req, res) => {
+	try {
+		const email = req.params.email;
+		//const documents = await db.collection('paymentInfo').find({email:email}).toArray();
+		const documents = await db.collection('paymentInfo').aggregate([
+            {
+                $match: { email: email }
+            },
+            {
+                $lookup: {
+                    from: 'bookingInfo',
+                    localField: 'transactionID',
+                    foreignField: 'transactionID',
+                    as: 'bookingInfo'
+                }
+            },
+            {
+                $addFields: {
+                    bookingInfo: { $arrayElemAt: ["$bookingInfo", 0] }
+                }
+            }
+        ]).toArray();
+		res.status(200).json(documents);
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Something went wrong!' });
+	}
+});
+
+app.get('/paymentInfoByID/:ID', async (req, res) => {
+	try {
+		const ID = req.params.ID;
+		//const documents = await db.collection('paymentInfo').find({transactionID: ID}).toArray();
+		const documents = await db.collection('paymentInfo').aggregate([
+            {
+                $match: { transactionID: ID }
+            },
+            {
+                $lookup: {
+                    from: 'bookingInfo',
+                    localField: 'transactionID',
+                    foreignField: 'transactionID',
+                    as: 'bookingInfo'
+                }
+            },
+            {
+                $addFields: {
+                    bookingInfo: { $arrayElemAt: ["$bookingInfo", 0] }
+                }
+            }
+        ]).toArray();
+		res.status(200).json(documents);
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Something went wrong!' });
+	}
+});
+
 app.get('/specificBookingInfo', async (req, res) => {
 	try {
 	  // Extract title, time, and date from the query parameters
