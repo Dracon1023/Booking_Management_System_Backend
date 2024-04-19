@@ -634,9 +634,9 @@ app.delete('/removePromo', async (req, res) => {
 app.get('/findPromo', async (req, res) => {
 	try {
 		const promoCode = req.body;
-		const result = await db.collection('promos').findOne(promoCode)
-		if (result) {
-			res.status(200).json({ success: true, result })
+		const promo = await db.collection('promos').findOne(promoCode)
+		if (promo) {
+			res.status(200).json({ success: true, promo })
 		} else {
 			res.status(404).json({ success: false, error: 'Promotional offer not found' });
 		}
