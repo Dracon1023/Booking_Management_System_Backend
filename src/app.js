@@ -433,34 +433,6 @@ app.get('/specificBookingInfo', async (req, res) => {
 	  res.status(500).json({ error: 'Something went wrong with the database operation' });
 	}
   });
-  
-  
-
-// Adds payment details to the user's database entry
-app.post('/users/paymentDetails/addDetails', async (req, res) => {
-	try {
-		const details = req.body.details;
-		const username = req.body.username;
-		db.collection('users').updateOne(
-			{}
-		)
-
-	} catch (error) {
-		console.error('Error:', error);
-		res.status(500).json({ error: 'Something went wrong!' });
-	}
-});
-
-// Removes a specific payment details from a user's database entry
-app.delete('/users/paymentDetails/removeDetails', async (req, res) => {
-
-});
-
-// Update a specific payment details in a user's database entry
-app.patch('/users/paymentDetails/updateDetails', async (req, res) => {
-
-});
-
 
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 const CLIENT_ID = process.env.CLIENT_ID
@@ -620,7 +592,59 @@ app.delete('/payment', authenticateJWT, async (req, res) => {
 	}
 });
 
+app.get('/allPromos', async (req, res) => {
+	let promos = []
+	db.collection('promos')
+		.find()
+		.forEach(promo => promos.push(promo))
+		.then(() => {
+			res.status(200).json(promos)
+		})
+		.catch(() => {
+			res.status(500).json({ error: 'Could not find promos' })
+		})
+});
 
+app.post('/offerPromo', async (req, res) => {
+	try {
+		const promo = req.body;
+		const result = await db.collection('promos').insertOne(promo);
+		res.status(201).json({ success: true, message: 'Promotional offer added successfully', result });
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Could not add promotional offer to database!' });
+	}
+});
+
+app.delete('/removePromo', async (req, res) => {
+	try {
+		const promo = req.body;
+		const result = await db.collection('promos').deleteOne(promo)
+		if (result.deletedCount === 1) {
+			res.status(200).json({ success: true, message: 'Promotional offer deleted successfully', deletedCount: result.deletedCount });
+		} else {
+			res.status(404).json({ success: false, error: 'Promotional offer not found' });
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		res.status(500).json({ error: 'Could not remove promotional offer from database!' });
+	}
+});
+
+app.get('/findPromo', async (req, res) => {
+	try {
+		const promoCode = req.body;
+		const promo = await db.collection('promos').findOne(promoCode)
+		if (promo) {
+			res.status(200).json({ success: true, promo })
+		} else {
+			res.status(404).json({ success: false, error: 'Promotional offer not found' });
+		}
+	} catch (error) {
+		console.log(error)
+		res.status(500).json({ error: 'Something went wrong!' })
+	}
+});
 
 
 
