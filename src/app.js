@@ -576,7 +576,49 @@ app.post('/paymentInfo', async (req, res) => {
   });
   
 
+app.get('/payment', authenticateJWT, async (req, res) => {
+	try {
+		const user = await db.collection('users').findOne({ "login.email": req.user.username });
+		const paymentDetails = user.paymentDetails;
+		res.status(200).json({ success: true, paymentDetails });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ success: false, error: 'Could not get payment details' });
+	}
+});
 
+// add payment details
+app.post('/payment', authenticateJWT, async (req, res) => {
+	try {
+		const paymentDetails = req.body;
+		const result = await db.collection('users').updateOne(
+			{ 'login.email': req.user.username },
+			{ $push: { 'paymentDetails': paymentDetails } }
+		);
+		res.status(201).json({ success: true, message: 'Payment details added successfully', result });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ success: false, error: 'Could not add payment details' });
+	}
+});
+
+app.delete('/payment', authenticateJWT, async (req, res) => {
+	try {
+		const paymentDetails = req.body;
+		const result = await db.collection('users').updateOne(
+			{ 'login.email': req.user.username },
+			{ $pull: { 'paymentDetails': paymentDetails } }
+		);
+		if (result.modifiedCount === 1) {
+			res.status(200).json({ success: true, message: 'Payment details deleted successfully', deletedCount: result.deletedCount });
+		} else {
+			res.status(404).json({ success: false, error: 'Payment details not found' });
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ success: false, error: 'Could not delete payment details' });
+	}
+});
 
 
 
