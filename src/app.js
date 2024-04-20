@@ -504,7 +504,7 @@ const sendMail = async (bookingDetails, userEmail, firstname) => {
 			<p>Here are your booking details:</p>
 			
 			<ul>
-			<li>Movie: ${bookingDetails.transactionID}</li>
+			<li>Transaction ID : ${bookingDetails.transactionID}</li>
 			<li>Movie: ${bookingDetails.movie}</li>
 			<li>Time: ${bookingDetails.time}</li>
 			<li>Date: ${bookingDetails.date}</li>
